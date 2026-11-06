@@ -3,10 +3,13 @@
 //
 // This script contains no price-parsing or anti-bot logic of its own: it calls
 // the extract-price skill scripts in order (fetch_page.mjs -> extract_price.mjs)
-// and collects their output into a single table.
+// and collects their output into one row per product.
 //
 // Usage:
-//   node run.mjs [--limit=N] [--json] [--out=file.md] [--urls=path] [--pause=20]
+//   node run.mjs [--limit=N] [--table] [--out=file] [--urls=path] [--pause=20]
+//
+// Default output is a JSON array (stdout), ready to be published as
+// YYYY-MM-DD.json by publish.mjs. Use --table for a human-readable markdown run.
 
 import fs from 'node:fs';
 import os from 'node:os';
@@ -92,7 +95,7 @@ const main = async () => {
     }
   }
 
-  const output = flags.json ? JSON.stringify(rows, null, 2) : toMarkdown(rows);
+  const output = flags.table ? toMarkdown(rows) : JSON.stringify(rows, null, 2);
   console.log(output);
   if (typeof flags.out === 'string') {
     fs.writeFileSync(path.resolve(flags.out), `${output}\n`);

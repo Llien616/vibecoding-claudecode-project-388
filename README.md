@@ -31,7 +31,8 @@
 │           ├── SKILL.md           # прогон 5 товаров через extract-price
 │           ├── urls.txt           # фиксированный список товаров
 │           └── scripts/
-│               └── run.mjs        # оркестратор: fetch → parse, пауза 20 с
+│               ├── run.mjs        # оркестратор: fetch → parse, пауза 20 с
+│               └── publish.mjs    # коммит YYYY-MM-DD.json в Llien616/tracker-data
 ├── .github/workflows/hexlet-check.yml
 ├── CLAUDE.md                      # инструкции для Claude Code
 └── README.md
@@ -76,20 +77,30 @@ headless-браузеры по отпечатку клиента, а не по I
 
 Скилл `tracker` прогоняет фиксированный список товаров из
 `.claude/skills/tracker/urls.txt` через `extract-price` (своей логики парсинга
-у него нет) и собирает одну таблицу прогона:
+у него нет) и публикует результат в `Llien616/tracker-data`:
 
 ```bash
-node .claude/skills/tracker/scripts/run.mjs
+node .claude/skills/tracker/scripts/run.mjs | node .claude/skills/tracker/scripts/publish.mjs
 ```
 
-```markdown
-| # | URL | regular_price | sale_price | has_credit |
-|---|-----|---------------|------------|------------|
-| 1 | https://www.ozon.ru/product/…-731553575 | 3 888 ₽ | 3 499 ₽ | false |
-| 2 | https://www.ozon.ru/product/…-2624612136 | 158 ₽ | 142 ₽ | false |
+Файл называется по дате прогона — `YYYY-MM-DD.json`:
+
+```json
+[
+  {
+    "url": "https://www.ozon.ru/product/…-731553575",
+    "regular_price": "3 888 ₽",
+    "sale_price": "3 499 ₽",
+    "has_credit": false
+  }
+]
 ```
 
-Между запросами цен — пауза 20 секунд, чтобы не попасть под блок Ozon.
+Файл не сохраняется локально: `publish.mjs` делает один вызов GitHub Contents
+API, то есть один коммит в `Llien616/tracker-data` без `git clone`/`git push`.
+В Claude Code ту же запись выполняет MCP-инструмент GitHub
+(`create_or_update_file`). Между запросами цен — пауза 20 секунд, чтобы не
+попасть под блок Ozon. Для просмотра без публикации: `run.mjs --table`.
 
 Результат:
 

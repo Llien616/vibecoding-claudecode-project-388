@@ -29,7 +29,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │           ├── SKILL.md           # прогон 5 товаров через extract-price
 │           ├── urls.txt           # фиксированный список товаров
 │           └── scripts/
-│               └── run.mjs        # оркестратор: fetch → parse, пауза 20 с
+│               ├── run.mjs        # оркестратор: fetch → parse, пауза 20 с
+│               └── publish.mjs    # коммит YYYY-MM-DD.json в Llien616/tracker-data
 ├── .github/workflows/             # hexlet-check.yml — не редактировать
 ├── CLAUDE.md
 └── README.md
@@ -46,6 +47,9 @@ node .claude/skills/extract-price/scripts/extract_price.mjs page.html
 
 # Прогнать трекер по всем товарам из .claude/skills/tracker/urls.txt
 node .claude/skills/tracker/scripts/run.mjs
+
+# Прогон + публикация результата в Llien616/tracker-data (один коммит)
+node .claude/skills/tracker/scripts/run.mjs | node .claude/skills/tracker/scripts/publish.mjs
 
 # Проверка синтаксиса скрипта
 node --check .claude/skills/extract-price/scripts/fetch_page.mjs
@@ -68,6 +72,11 @@ Ozon блокирует `curl` и headless-браузеры по отпечат�
 - Скилл `tracker` не дублирует логику `extract-price`: он только по очереди
   вызывает его скрипты, делает паузу 20 с между запросами и сводит результат
   в одну таблицу (строка на товар: URL, regular_price, sale_price, has_credit).
+- Результат трекера — файл `YYYY-MM-DD.json` (дата прогона) в репозитории
+  `Llien616/tracker-data`, ветка `main`. Локально файл не сохраняется:
+  запись идёт через коннектор GitHub (MCP `create_or_update_file` или
+  эквивалентный `PUT` в `publish.mjs`), один прогон = один коммит.
+  Никаких `git clone` и `git push` в этот репозиторий из проекта.
 - Коммиты — на английском, в императиве (`Add …`, `Fix …`).
 - Не удалять и не переименовывать `.github/workflows/hexlet-check.yml` и сам репозиторий.
 
