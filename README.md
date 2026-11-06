@@ -29,6 +29,7 @@
 │       │       └── extract_price.mjs  # разбор сохранённого HTML
 │       └── tracker/
 │           ├── SKILL.md           # прогон 5 товаров через extract-price
+│           ├── KNOWLEDGE.md       # правила значимости изменений цен
 │           ├── urls.txt           # фиксированный список товаров
 │           └── scripts/
 │               ├── run.mjs        # оркестратор: fetch → parse, пауза 20 с
