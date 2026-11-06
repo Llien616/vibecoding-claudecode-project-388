@@ -1,0 +1,21 @@
+# Personal Claude Code settings
+.claude/settings.local.json
+
+# Local assistant tooling
+.deepcode/
+
+# Secrets
+.env
+.env.*
+
+# Dependencies
+node_modules/
+
+# Downloaded pages and logs
+tmp/
+ozon-*.html
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
