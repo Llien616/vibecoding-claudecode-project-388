@@ -22,11 +22,16 @@
 │   ├── commands/
 │   │   └── check-price.md         # /check-price <ссылка на Ozon>
 │   └── skills/
-│       └── extract-price/
-│           ├── SKILL.md           # описание скилла и алгоритм обхода блокировки
+│       ├── extract-price/
+│       │   ├── SKILL.md           # описание скилла и алгоритм обхода блокировки
+│       │   └── scripts/
+│       │       ├── fetch_page.mjs     # загрузка карточки через видимый Chrome + CDP
+│       │       └── extract_price.mjs  # разбор сохранённого HTML
+│       └── tracker/
+│           ├── SKILL.md           # прогон 5 товаров через extract-price
+│           ├── urls.txt           # фиксированный список товаров
 │           └── scripts/
-│               ├── fetch_page.mjs     # загрузка карточки через видимый Chrome + CDP
-│               └── extract_price.mjs  # разбор сохранённого HTML
+│               └── run.mjs        # оркестратор: fetch → parse, пауза 20 с
 ├── .github/workflows/hexlet-check.yml
 ├── CLAUDE.md                      # инструкции для Claude Code
 └── README.md
@@ -66,6 +71,25 @@ node .claude/skills/extract-price/scripts/extract_price.mjs /tmp/ozon-5247783662
 `fetch_page.mjs` открывает видимый Chrome с DevTools-портом: Ozon режет `curl` и
 headless-браузеры по отпечатку клиента, а не по IP, поэтому обычный HTTP-запрос
 получает страницу «Похоже, нет соединения».
+
+## Трекер
+
+Скилл `tracker` прогоняет фиксированный список товаров из
+`.claude/skills/tracker/urls.txt` через `extract-price` (своей логики парсинга
+у него нет) и собирает одну таблицу прогона:
+
+```bash
+node .claude/skills/tracker/scripts/run.mjs
+```
+
+```markdown
+| # | URL | regular_price | sale_price | has_credit |
+|---|-----|---------------|------------|------------|
+| 1 | https://www.ozon.ru/product/…-731553575 | 3 888 ₽ | 3 499 ₽ | false |
+| 2 | https://www.ozon.ru/product/…-2624612136 | 158 ₽ | 142 ₽ | false |
+```
+
+Между запросами цен — пауза 20 секунд, чтобы не попасть под блок Ozon.
 
 Результат:
 

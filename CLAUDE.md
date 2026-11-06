@@ -20,11 +20,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   ├── commands/
 │   │   └── check-price.md         # слэш-команда /check-price
 │   └── skills/
-│       └── extract-price/
-│           ├── SKILL.md           # инструкция скилла (frontmatter: name, description)
+│       ├── extract-price/
+│       │   ├── SKILL.md           # инструкция скилла (frontmatter: name, description)
+│       │   └── scripts/
+│       │       ├── fetch_page.mjs     # загрузка карточки через видимый Chrome + CDP
+│       │       └── extract_price.mjs  # парсинг сохранённого HTML
+│       └── tracker/
+│           ├── SKILL.md           # прогон 5 товаров через extract-price
+│           ├── urls.txt           # фиксированный список товаров
 │           └── scripts/
-│               ├── fetch_page.mjs     # загрузка карточки через видимый Chrome + CDP
-│               └── extract_price.mjs  # парсинг сохранённого HTML
+│               └── run.mjs        # оркестратор: fetch → parse, пауза 20 с
 ├── .github/workflows/             # hexlet-check.yml — не редактировать
 ├── CLAUDE.md
 └── README.md
@@ -38,6 +43,9 @@ node .claude/skills/extract-price/scripts/fetch_page.mjs "https://www.ozon.ru/pr
 
 # Разобрать сохранённую страницу товара Ozon
 node .claude/skills/extract-price/scripts/extract_price.mjs page.html
+
+# Прогнать трекер по всем товарам из .claude/skills/tracker/urls.txt
+node .claude/skills/tracker/scripts/run.mjs
 
 # Проверка синтаксиса скрипта
 node --check .claude/skills/extract-price/scripts/fetch_page.mjs
@@ -57,6 +65,9 @@ Ozon блокирует `curl` и headless-браузеры по отпечат�
 - Ответ по скиллу `extract-price` — **только JSON-объект**
   `{"regular_price": "...", "sale_price": "...", "has_credit": false}`,
   без названия, наличия, рейтинга и любых пояснений.
+- Скилл `tracker` не дублирует логику `extract-price`: он только по очереди
+  вызывает его скрипты, делает паузу 20 с между запросами и сводит результат
+  в одну таблицу (строка на товар: URL, regular_price, sale_price, has_credit).
 - Коммиты — на английском, в императиве (`Add …`, `Fix …`).
 - Не удалять и не переименовывать `.github/workflows/hexlet-check.yml` и сам репозиторий.
 
