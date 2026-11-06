@@ -25,7 +25,8 @@
 │       └── extract-price/
 │           ├── SKILL.md           # описание скилла и алгоритм обхода блокировки
 │           └── scripts/
-│               └── extract_price.mjs
+│               ├── fetch_page.mjs     # загрузка карточки через видимый Chrome + CDP
+│               └── extract_price.mjs  # разбор сохранённого HTML
 ├── .github/workflows/hexlet-check.yml
 ├── CLAUDE.md                      # инструкции для Claude Code
 └── README.md
@@ -48,12 +49,23 @@ cd vibecoding-claudecode-project-388
 /check-price https://www.ozon.ru/product/t-d-s-braslet-so-vstavkami-5247783662
 ```
 
-Или вручную: скачать HTML карточки (команда — в `.claude/skills/extract-price/SKILL.md`)
-и разобрать его скриптом:
+Или вручную: загрузить карточку и разобрать её скриптами скилла:
 
 ```bash
+node .claude/skills/extract-price/scripts/fetch_page.mjs \
+  "https://www.ozon.ru/product/t-d-s-braslet-so-vstavkami-5247783662/" /tmp/ozon-5247783662.html
 node .claude/skills/extract-price/scripts/extract_price.mjs /tmp/ozon-5247783662.html
 ```
+
+Ответ по скиллу — только JSON-объект:
+
+```json
+{"regular_price": "1 462 ₽", "sale_price": "1 316 ₽", "has_credit": false}
+```
+
+`fetch_page.mjs` открывает видимый Chrome с DevTools-портом: Ozon режет `curl` и
+headless-браузеры по отпечатку клиента, а не по IP, поэтому обычный HTTP-запрос
+получает страницу «Похоже, нет соединения».
 
 Результат:
 
