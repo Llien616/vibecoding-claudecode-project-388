@@ -32,8 +32,11 @@
 │           ├── KNOWLEDGE.md       # правила значимости изменений цен
 │           ├── urls.txt           # фиксированный список товаров
 │           └── scripts/
-│               ├── run.mjs        # оркестратор: fetch → parse, пауза 20 с
-│               └── publish.mjs    # коммит YYYY-MM-DD.json в Llien616/tracker-data
+│               ├── track.mjs      # полный цикл: сбор → сравнение → публикация
+│               ├── run.mjs        # сбор цен: fetch → parse, пауза 20 с
+│               ├── compare.mjs    # сравнение с предыдущим прогоном
+│               ├── publish.mjs    # коммит YYYY-MM-DD.json в Llien616/tracker-data
+│               └── lib/github.mjs # коннектор GitHub: список, чтение, запись
 ├── .github/workflows/hexlet-check.yml
 ├── CLAUDE.md                      # инструкции для Claude Code
 └── README.md
@@ -78,10 +81,31 @@ headless-браузеры по отпечатку клиента, а не по I
 
 Скилл `tracker` прогоняет фиксированный список товаров из
 `.claude/skills/tracker/urls.txt` через `extract-price` (своей логики парсинга
-у него нет) и публикует результат в `Llien616/tracker-data`:
+у него нет), сравнивает прогон с предыдущим и публикует результат
+в `Llien616/tracker-data`:
 
 ```bash
-node .claude/skills/tracker/scripts/run.mjs | node .claude/skills/tracker/scripts/publish.mjs
+node .claude/skills/tracker/scripts/track.mjs
+```
+
+Перед сохранением `track.mjs` читает последний по дате файл из
+`Llien616/tracker-data`, сопоставляет товары по `url` и выводит **только
+значимые** изменения по правилам `.claude/skills/tracker/KNOWLEDGE.md`
+(порог 5 % для `regular_price`, появление или снижение `sale_price`,
+новые и пропавшие URL). Нет прошлых прогонов — сравнение пропускается.
+
+```json
+[
+  {
+    "rule": 1,
+    "url": "https://www.ozon.ru/product/…-5659780691",
+    "field": "regular_price",
+    "previous": "522 ₽",
+    "current": "490 ₽",
+    "change_percent": -6.13,
+    "reason": "regular_price changed by -6.13% (threshold 5%)"
+  }
+]
 ```
 
 Файл называется по дате прогона — `YYYY-MM-DD.json`:

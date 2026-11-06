@@ -84,12 +84,12 @@ abs(new_regular - old_regular) / old_regular * 100 >= 5
 ```json
 {
   "rule": 1,
-  "url": "https://www.ozon.ru/product/…-5247783662",
+  "url": "https://www.ozon.ru/product/…-5659780691",
   "field": "regular_price",
-  "previous": "1 462 ₽",
-  "current": "1 428 ₽",
-  "change_percent": -2.33,
-  "reason": "regular_price changed by 2.33% (threshold 5%)"
+  "previous": "522 ₽",
+  "current": "490 ₽",
+  "change_percent": -6.13,
+  "reason": "regular_price changed by -6.13% (threshold 5%)"
 }
 ```
 

@@ -30,8 +30,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │           ├── KNOWLEDGE.md       # правила значимости изменений цен
 │           ├── urls.txt           # фиксированный список товаров
 │           └── scripts/
-│               ├── run.mjs        # оркестратор: fetch → parse, пауза 20 с
-│               └── publish.mjs    # коммит YYYY-MM-DD.json в Llien616/tracker-data
+│               ├── track.mjs      # полный цикл: сбор → сравнение → публикация
+│               ├── run.mjs        # сбор цен: fetch → parse, пауза 20 с
+│               ├── compare.mjs    # сравнение с предыдущим прогоном
+│               ├── publish.mjs    # коммит YYYY-MM-DD.json в Llien616/tracker-data
+│               └── lib/github.mjs # коннектор GitHub: список, чтение, запись
 ├── .github/workflows/             # hexlet-check.yml — не редактировать
 ├── CLAUDE.md
 └── README.md
@@ -46,11 +49,13 @@ node .claude/skills/extract-price/scripts/fetch_page.mjs "https://www.ozon.ru/pr
 # Разобрать сохранённую страницу товара Ozon
 node .claude/skills/extract-price/scripts/extract_price.mjs page.html
 
-# Прогнать трекер по всем товарам из .claude/skills/tracker/urls.txt
-node .claude/skills/tracker/scripts/run.mjs
+# Полный цикл: цены → сравнение с прошлым прогоном → коммит, вывод значимых изменений
+node .claude/skills/tracker/scripts/track.mjs
 
-# Прогон + публикация результата в Llien616/tracker-data (один коммит)
-node .claude/skills/tracker/scripts/run.mjs | node .claude/skills/tracker/scripts/publish.mjs
+# Отдельные шаги: сбор, сравнение, публикация
+node .claude/skills/tracker/scripts/run.mjs
+node .claude/skills/tracker/scripts/compare.mjs --file=run.json
+node .claude/skills/tracker/scripts/publish.mjs --file=run.json
 
 # Проверка синтаксиса скрипта
 node --check .claude/skills/extract-price/scripts/fetch_page.mjs
@@ -73,6 +78,10 @@ Ozon блокирует `curl` и headless-браузеры по отпечат�
 - Скилл `tracker` не дублирует логику `extract-price`: он только по очереди
   вызывает его скрипты, делает паузу 20 с между запросами и сводит результат
   в одну таблицу (строка на товар: URL, regular_price, sale_price, has_credit).
+- Перед сохранением прогона `tracker` читает предыдущий файл из
+  `Llien616/tracker-data`, сопоставляет товары по `url` и выводит **только
+  значимые** изменения по правилам `KNOWLEDGE.md`; нет прошлых прогонов —
+  сравнение пропускается.
 - Результат трекера — файл `YYYY-MM-DD.json` (дата прогона) в репозитории
   `Llien616/tracker-data`, ветка `main`. Локально файл не сохраняется:
   запись идёт через коннектор GitHub (MCP `create_or_update_file` или
