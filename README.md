@@ -29,17 +29,17 @@
 │       │       └── extract_price.mjs  # разбор сохранённого HTML
 │       └── tracker/
 │           ├── SKILL.md           # прогон 5 товаров через extract-price
-│           ├── KNOWLEDGE.md       # правила значимости изменений цен
 │           ├── urls.txt           # фиксированный список товаров
 │           └── scripts/
 │               ├── track.mjs      # полный цикл: сбор → сравнение → публикация
 │               ├── run.mjs        # сбор цен: fetch → parse, пауза 20 с
 │               ├── compare.mjs    # сравнение с предыдущим прогоном
 │               ├── publish.mjs    # коммит YYYY-MM-DD.json в Llien616/tracker-data
-│               ├── send.py        # отправка сообщения в Telegram (только stdlib)
 │               └── lib/github.mjs # коннектор GitHub: список, чтение, запись
 ├── .github/workflows/hexlet-check.yml
 ├── CLAUDE.md                      # инструкции для Claude Code
+├── KNOWLEDGE.md                   # правила значимости изменений цен
+├── send.py                        # отправка сообщения в Telegram (только stdlib)
 └── README.md
 ```
 
@@ -71,9 +71,9 @@ TELEGRAM_CHAT_ID=<id чата или канала>
 библиотеку Python (`urllib`), без внешних зависимостей:
 
 ```bash
-python .claude/skills/tracker/scripts/send.py "Значимых изменений: 2"
-python .claude/skills/tracker/scripts/send.py --file=report.md
-node .claude/skills/tracker/scripts/track.mjs | python .claude/skills/tracker/scripts/send.py
+python send.py "Значимых изменений: 2"
+python send.py --file=report.md
+node .claude/skills/tracker/scripts/track.mjs | python send.py
 ```
 
 Полезные флаги: `--dry-run` (проверить текст и разбивку, ничего не отправляя),
@@ -121,7 +121,7 @@ node .claude/skills/tracker/scripts/track.mjs
 
 Перед сохранением `track.mjs` читает последний по дате файл из
 `Llien616/tracker-data`, сопоставляет товары по `url` и выводит **только
-значимые** изменения по правилам `.claude/skills/tracker/KNOWLEDGE.md`
+значимые** изменения по правилам `KNOWLEDGE.md` в корне проекта
 (порог 5 % для `regular_price`, появление или снижение `sale_price`,
 новые и пропавшие URL). Нет прошлых прогонов — сравнение пропускается.
 

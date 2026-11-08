@@ -5,7 +5,7 @@
 //   2. List the run files in Llien616/tracker-data and read the newest one
 //      before the current date (the previous run). No previous runs — no comparison.
 //   3. Match products by URL and compare regular_price / sale_price using the
-//      rules from ../KNOWLEDGE.md.
+//      rules from KNOWLEDGE.md (repository root).
 //   4. Publish the run as YYYY-MM-DD.json (single commit through the connector).
 //
 // Only significant changes are printed (JSON array, [] when nothing happened).

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Compare a tracker run with the previous one and report significant changes.
 //
-// The rules live in ../KNOWLEDGE.md:
+// The rules live in KNOWLEDGE.md at the repository root:
 //   1. regular_price changed by >= 5% (both directions)
 //   2. sale_price appeared (was missing before)
 //   3. sale_price decreased

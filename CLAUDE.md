@@ -27,17 +27,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │       │       └── extract_price.mjs  # парсинг сохранённого HTML
 │       └── tracker/
 │           ├── SKILL.md           # прогон 5 товаров через extract-price
-│           ├── KNOWLEDGE.md       # правила значимости изменений цен
 │           ├── urls.txt           # фиксированный список товаров
 │           └── scripts/
 │               ├── track.mjs      # полный цикл: сбор → сравнение → публикация
 │               ├── run.mjs        # сбор цен: fetch → parse, пауза 20 с
 │               ├── compare.mjs    # сравнение с предыдущим прогоном
 │               ├── publish.mjs    # коммит YYYY-MM-DD.json в Llien616/tracker-data
-│               ├── send.py        # отправка сообщения в Telegram (только stdlib)
 │               └── lib/github.mjs # коннектор GitHub: список, чтение, запись
 ├── .github/workflows/             # hexlet-check.yml — не редактировать
 ├── CLAUDE.md
+├── KNOWLEDGE.md                   # правила значимости изменений цен
+├── send.py                        # отправка сообщения в Telegram (только stdlib)
 └── README.md
 ```
 
@@ -59,9 +59,9 @@ node .claude/skills/tracker/scripts/compare.mjs --file=run.json
 node .claude/skills/tracker/scripts/publish.mjs --file=run.json
 
 # Отправить сообщение в Telegram (токен и chat id — из .env)
-python .claude/skills/tracker/scripts/send.py "текст сообщения"
-python .claude/skills/tracker/scripts/send.py --file=report.md
-python .claude/skills/tracker/scripts/send.py --dry-run "проверка"
+python send.py "текст сообщения"
+python send.py --file=report.md
+python send.py --dry-run "проверка"
 
 # Проверка синтаксиса скрипта
 node --check .claude/skills/extract-price/scripts/fetch_page.mjs
