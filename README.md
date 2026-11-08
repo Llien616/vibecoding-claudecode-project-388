@@ -36,6 +36,7 @@
 │               ├── run.mjs        # сбор цен: fetch → parse, пауза 20 с
 │               ├── compare.mjs    # сравнение с предыдущим прогоном
 │               ├── publish.mjs    # коммит YYYY-MM-DD.json в Llien616/tracker-data
+│               ├── send.py        # отправка сообщения в Telegram (только stdlib)
 │               └── lib/github.mjs # коннектор GitHub: список, чтение, запись
 ├── .github/workflows/hexlet-check.yml
 ├── CLAUDE.md                      # инструкции для Claude Code
@@ -49,7 +50,7 @@ git clone https://github.com/Llien616/vibecoding-claudecode-project-388.git
 cd vibecoding-claudecode-project-388
 ```
 
-Зависимостей нет — нужен только Node.js 18+.
+Зависимостей нет — нужен Node.js 18+ и Python 3.9+ (для `send.py`).
 
 ## Переменные окружения
 
@@ -63,6 +64,23 @@ TELEGRAM_CHAT_ID=<id чата или канала>
 `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID` нужны для отправки уведомлений о
 значимых изменениях цен. Создать бота — у [@BotFather](https://t.me/BotFather),
 узнать id чата — через `getUpdates`.
+
+## Уведомления в Telegram
+
+`send.py` отправляет сообщение ботом из `.env`, использует только стандартную
+библиотеку Python (`urllib`), без внешних зависимостей:
+
+```bash
+python .claude/skills/tracker/scripts/send.py "Значимых изменений: 2"
+python .claude/skills/tracker/scripts/send.py --file=report.md
+node .claude/skills/tracker/scripts/track.mjs | python .claude/skills/tracker/scripts/send.py
+```
+
+Полезные флаги: `--dry-run` (проверить текст и разбивку, ничего не отправляя),
+`--chat-id` (переопределить чат), `--parse-mode=HTML`, `--silent`,
+`--timeout=<сек>`. Сообщения длиннее лимита Telegram (4096 символов)
+разбиваются на несколько. Результат — JSON: `{"ok": true, "message_ids": [42]}`;
+при ошибке — `{"ok": false, "error": "..."}` и код возврата 1.
 
 ## Использование
 

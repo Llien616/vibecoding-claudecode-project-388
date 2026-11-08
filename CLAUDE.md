@@ -34,6 +34,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │               ├── run.mjs        # сбор цен: fetch → parse, пауза 20 с
 │               ├── compare.mjs    # сравнение с предыдущим прогоном
 │               ├── publish.mjs    # коммит YYYY-MM-DD.json в Llien616/tracker-data
+│               ├── send.py        # отправка сообщения в Telegram (только stdlib)
 │               └── lib/github.mjs # коннектор GitHub: список, чтение, запись
 ├── .github/workflows/             # hexlet-check.yml — не редактировать
 ├── CLAUDE.md
@@ -57,6 +58,11 @@ node .claude/skills/tracker/scripts/run.mjs
 node .claude/skills/tracker/scripts/compare.mjs --file=run.json
 node .claude/skills/tracker/scripts/publish.mjs --file=run.json
 
+# Отправить сообщение в Telegram (токен и chat id — из .env)
+python .claude/skills/tracker/scripts/send.py "текст сообщения"
+python .claude/skills/tracker/scripts/send.py --file=report.md
+python .claude/skills/tracker/scripts/send.py --dry-run "проверка"
+
 # Проверка синтаксиса скрипта
 node --check .claude/skills/extract-price/scripts/fetch_page.mjs
 ```
@@ -69,8 +75,12 @@ Ozon блокирует `curl` и headless-браузеры по отпечат�
 
 - Скиллы живут в `.claude/skills/<name>/SKILL.md`; frontmatter — `name` и `description`
   (description пишется так, чтобы модель понимала, когда скилл применять).
-- Скрипты скилла — в `<skill>/scripts/`, запуск через `node` без внешних зависимостей.
+- Скрипты скилла — в `<skill>/scripts/`, запуск через `node` без внешних зависимостей
+  (исключение — `send.py`: Python 3.9+ и только стандартная библиотека).
 - Секреты (токен Telegram-бота и т. п.) — только в `.env`, файл в `.gitignore`.
+- Скрипт `send.py` использует только стандартную библиотеку Python (`urllib`);
+  `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID` читаются из `.env`, переменные
+  окружения имеют приоритет. Длинные сообщения режутся по лимиту 4096 символов.
 - Для Ozon всегда сообщать **обе** цены: обычную и с Ozon Картой.
 - Ответ по скиллу `extract-price` — **только JSON-объект**
   `{"regular_price": "...", "sale_price": "...", "has_credit": false}`,
