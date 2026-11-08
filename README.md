@@ -51,6 +51,19 @@ cd vibecoding-claudecode-project-388
 
 Зависимостей нет — нужен только Node.js 18+.
 
+## Переменные окружения
+
+Секреты хранятся в `.env` (файл в `.gitignore`, в репозиторий не попадает):
+
+```dotenv
+TELEGRAM_BOT_TOKEN=<токен бота из @BotFather>
+TELEGRAM_CHAT_ID=<id чата или канала>
+```
+
+`TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID` нужны для отправки уведомлений о
+значимых изменениях цен. Создать бота — у [@BotFather](https://t.me/BotFather),
+узнать id чата — через `getUpdates`.
+
 ## Использование
 
 В Claude Code:
